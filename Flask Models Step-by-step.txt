@@ -1,0 +1,376 @@
+Flask Models Step-by-step
+
+1. Installing python (if already done in previous project, then skip this step)
+    a) www.python.org/downloads. 
+       Note: Use customize installation: add python to your path, check all the checkboxes
+    b) Testing the python installation
+       * in the command/terminal window, type "python --version"
+
+2. Create a new directory to hold the VS Code project
+    a) make the following directory: flask_models
+
+3. Run the VS Code in that given directory
+
+4. Installing pip via VS Code terminal window
+    a) in the terminal window, type: py -m pip install --upgrade pip
+
+    Important Note: some MS Windows users will get an error in the above command. 
+                    One possible cause of such problem is the execution policy in  
+                    your computer. To check what policy you have in your computer 
+                    and change it if necessary is shown below:
+        i)   Select Start > All Programs > Windows PowerShell version > Windows PowerShell.
+        ii)  Type Set-ExecutionPolicy RemoteSigned to set the policy to RemoteSigned.
+        iii) Type Set-ExecutionPolicy Unrestricted to set the policy to Unrestricted.
+        iv)  Type Get-ExecutionPolicy to verify the current settings for the execution policy.
+        v)   Type Exit.
+
+5. Creating and activating a virtual environment
+    a) Creating a virtual environment: from within VS Code terminal window type: python -m venv .
+    b) Activating the virtual environment
+       i)  In Mac OS type:   source ./bin/activate
+       ii) In Windows type:  .\Scripts\activate
+    Note: check if your terminal command prompt has the project name in between parenthesis
+
+6. Intalling Flask and Flask SQLAlchemy libraries
+    a) in the terminal window, type: pip install flask flask-sqlalchemy
+
+7. The hands-on project that will be used to explain Flask models: The Todo Application (go over the completed 
+project)
+
+8. Show and discuss the slide with the Model-View-Controller diagram (syllabus)
+
+9. Create the main application file: main_app.py and add the following code:
+	Code Insert #01:
+
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+	return "Hello, World"
+
+if __name__ == "__main__":
+	app.run(debug=True)
+
+10. Run application to check your progress
+	a. In the terminal window type: py main_app.py
+	b. Follow the link in your browser
+
+11. Create the index.html file
+	a. Create the templates directory
+	b. Create the index.html file
+	c. Copy code insert #02 into it
+
+		Code Insert #02:
+		<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta http-equiv="X-UA-Compatible" content="IE=edge">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Document</title>
+			</head>
+			<body>
+				<h1> Hello, World 2 </h1>
+			</body>
+		</html>
+	d. Update main_app.py:
+		i. Replace return "Hello, World 2"
+		ii. With: return render_template("index.html")
+		iii. update import statement: render_template
+
+	e. Run application to check implementation
+
+12. Create the basePage.html
+	a. Create basePage.html in the templates directory
+	b. Copy code insert #03
+
+		Code Insert #03:
+
+		<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta http-equiv="X-UA-Compatible" content="IE=edge">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				{% block head %} {% endblock %}
+			</head>
+			<body>
+				{% block body %} {% endblock %}
+			</body>
+		</html>
+
+13. Update index.html to extend the basePage.html
+	a. Replace existing content in index.html with the code insert #04
+
+	Code Insert #04:
+		{% extends 'basePage.html' %}
+		{% block head %}
+			<title>Index page</title>
+		{% endblock %}
+		{% block body %}
+			<h1> Hello, World 4 </h1>
+		{% endblock %}
+	b. Run application to check implementation
+
+14. Creating a CSS file
+	a. Create a directory called static
+	b. Under static, create two subdirectories: css and js
+	c. In the css directory create a main.css file
+	d. Add the content found in code insert #05
+
+	Code Insert #05:
+		body {
+			margin: auto;
+			font-family: sams-serif;
+			text-align: center;
+		}
+
+		h1 {
+			color: orange;
+			text-align: center;
+		} 
+
+		table, th, td {
+			border: 1px solid;
+			margin: auto;
+		}
+
+		th, td {
+			min-width: 100px;
+			text-align: center;
+		}
+
+		form {
+			padding-top: 20px;
+			display: inline-block;
+		}
+
+	e. Update the basePage.html
+		i. Don’t use <link rel=”stylesheet” href=”static/css/main.css”>
+		ii. Use this instead: <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css')}}">
+
+	f. Run application to check implementation
+
+
+15. Create the model and link to the SQLAlchemy database
+	a. Create the model
+		i. Create a file that will contain the Todo Model, TodoModel.py
+		ii. Add the code insert #06 into this file
+
+		Code Insert #06:
+
+from sqlalchemy import Column, String, Integer, Date
+from sqlalchemy.orm import declarative_base
+import datetime as dt
+
+Base = declarative_base()
+
+class Todo(Base):
+
+	__tablename__ = "Todos"
+
+	id = Column("id", Integer, primary_key=True, autoincrement=True)
+	content = Column("content", String, nullable=False)
+	date_created = Column("date_created", Date, nullable=False, default=dt.datetime.utcnow)
+
+	def __int__(self, content):
+		self.content = content
+
+	def __repr__(self):
+		return f"({self.id} {self.content} {self.date_created})"
+
+	b. Update the main_app.py
+		i. Add the code found in code insert #07
+		
+		Code Insert #07:
+
+from flask import Flask, render_template, request, redirect, abort
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from TodoModel import Base, Todo
+
+app = Flask(__name__)
+
+engine = create_engine("sqlite:///mydb.db", echo=True)
+Base.metadata.create_all(bind=engine)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+16. Update the index.html file to display the initial Todo table and input form
+	a. Add the Todo table: 
+		i. Replace line with the “Hello World 4” string with the contents of code insert #09
+
+		Code Insert #09:
+	
+		<div id="content">
+			<h1> Task Master </h1>
+			<table>
+				<tr>
+					<th>Task</th>
+					<th>Added</th>
+					<th>Actions</th>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td>
+						<a href="">Delete</a>
+						<br>
+						<a href="">Update</a>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		ii. Run your application to check that everything is as expected
+
+	b. Add the form to input new tasks
+		i. Add the contents of code insert #10 at the end of the index.html file
+
+		Code Insert #10:
+
+		<form action="/" method="POST">
+			<input type="text" name="content" id="content">
+			<input type="submit" value="Add Task">
+		</form>
+
+		ii. Run your application to check that everything is as expected
+
+17. Update main_app.py to respond to the post request from the index.html
+	a. Replace the current code found in the index() function with code insert #11
+
+	Code Insert #11:
+
+@app.route("/", methods = ["GET", "POST"])
+def index():
+	if request.method == 'POST':
+		task_content = request.form['content']
+		new_task = Todo(content=task_content)
+		try:
+			session.add(new_task)
+			session.commit()
+			return redirect('/')
+		except:
+			return 'There was an issue adding your task'
+	else:
+		tasks = session.query(Todo).order_by(Todo.date_created).all()
+		return render_template("index.html", tasks = tasks)
+
+18. Update index.html to populate the page with the tasks found in the database
+	a. Replace the current table lines with code insert #12
+
+	Code Insert #12:
+
+	{% for task in tasks %}
+		<tr>
+			<td> {{ task.content }} </td>
+			<td> {{ task.date_created }} </td>
+			<td>
+				<a href="">Delete</a>
+				<br>
+				<a href="">Update</a>
+			</td>
+		</tr>
+	{% endfor %}
+
+	b. Run your application to verify that the code is performing as expected
+
+19. Implementing the delete functionality
+	a. Update the href attribute in the index.html file
+		i. Replace existing code with code insert #13
+
+		Code Insert #13:
+
+		<td>
+			<a href="/delete/{{task.id}}">Delete</a>
+			<br>
+			<a href="">Update</a>
+		</td>
+
+	b. Create the /delete route in the main_app.py
+		i. Add code insert #14 into the route
+
+		Code Insert #14:
+
+@app.route('/delete/<int:id>')
+def delete(id):
+	task_to_delete = session.query(Todo).get(id)
+	if task_to_delete is None:
+		abort(404)
+	try:
+		session.delete(task_to_delete)
+		session.commit()
+		return redirect("/")
+	except:
+		return 'There was a problem deleting that task'
+
+		ii. Run your application and verify that it is working as expected by deleting a task or two
+
+20. Implement the update functionality
+	a. Update the update href attribute in the index.html file
+		i. Replace existing code with code insert #15
+		
+		Code Insert #15:
+
+		<td>
+			<a href="/delete/{{task.id}}">Delete</a>
+			<br>
+			<a href="/update/{{task.id}}">Update</a>
+		</td>
+
+	b. Create the /update route in the main_app.py
+		i. Add code insert #16 into the route
+
+		Code Insert #16:
+
+@app.route('/update/<int:id>', methods = ['POST', 'GET'])
+def update(id):
+	task = session.query(Todo).get(id)
+	if task is None:
+		abort(404)
+	if request.method == 'POST':
+		task.content = request.form['content']
+		try:
+			session.commit()
+			return redirect('/')
+		except:
+			return 'There was an issue updating your task'
+	else:
+		return render_template('update.html', task=task)
+
+	c. Create the update page and implementing its functionality in the project
+		i. Creating the update.html page
+			1. Create a new html file in the templates directory: update.html
+			2. Place the contents from the insert code #17
+
+			Code Insert #17:
+
+			{% extends 'basePage.html' %}
+
+			{% block head %} <title>Update page</title> {% endblock %}
+
+			{% block body %}
+				<div class="content">
+					<h1> Update Task </h1>
+					<br>
+					<form action="/update/{{task.id}}" method="POST">
+						<input type="text" name="content" id="content" value="{{task.content}}">
+						<input type="submit" value="Update Task">
+					</form>
+				</div>
+			{% endblock %}
+
+	d. Run your application and verify that it is working as expected by updating a task or two
+
+21. Final touch: when there is no task, don’t display an empty table, but rather a meaningful message
+	a. In the index.html file add the code insert #19
+
+	Code Insert #19:
+ 
+	{% if tasks %}
+		<table>
+		 …
+		</table>
+	{% else %}
+ 		<h2> There are no tasks to be displayed. Please enter a task </h2>
+ 	{% endif %}
