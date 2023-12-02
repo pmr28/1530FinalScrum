@@ -14,7 +14,6 @@ Scrum Master: Matthew Mell(Sprint 1)/ Nicole Poliski(Sprint 2)\
 5. "flask --app finance_tracker run"
 
 OR 
-
 ##### Use the makefile (still in terminal in project folder): 
 1. "python3 -m venv .venv"
 2. ". .venv/bin/activate"
