@@ -6,6 +6,7 @@ Scrum Master: Matthew Mell(Sprint 1)/ Nicole Poliski(Sprint 2)\
 
 
 ### How To Run
+##### In terminal in project folder:
 1. "python3 -m venv .venv"
 2. ". .venv/bin/activate"
 3. "pip install -r requirements.txt"
@@ -14,7 +15,7 @@ Scrum Master: Matthew Mell(Sprint 1)/ Nicole Poliski(Sprint 2)\
 
 OR 
 
-Use the makefile: 
+##### Use the makefile (still in terminal in project folder): 
 1. "python3 -m venv .venv"
 2. ". .venv/bin/activate"
 2. "make init"
