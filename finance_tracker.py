@@ -59,4 +59,53 @@ def initdb():
 def hello():
     return render_template("hello.html")
 
+
+@app.route("/home", methods=['GET', 'POST'])
+def home():
+    return render_template("home.html")
+
+@app.route("/signin", methods=['GET', 'POST'])
+def signin():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.password == password:
+            session['user_id'] = user.user_id
+            flash('Logged in successfully!')
+            return redirect(url_for('home'))  
+
+        flash('Wrong username or password! TRY AGAIN')
+
+    return render_template("signin.html")
+
+@app.route("/signup", methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        #if the username already exists
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists. TRY AGAIN')
+            return redirect(url_for('signup'))
+
+        # make sure passwords match
+        if password != confirm_password:
+            flash('Passwords do not match. TRY AGAIN')
+            return redirect(url_for('signup'))
+
+        # create a user profile
+        new_user = User(username=username, password=password, group='user')
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Your account has been created successfully, please sign in')
+        return redirect(url_for('signin'))
+
+    return render_template("signup.html")
+
 app.secret_key = "AERTEYHO"
