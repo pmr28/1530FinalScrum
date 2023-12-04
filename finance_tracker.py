@@ -53,6 +53,13 @@ def initdb():
     db.session.add(User(username='admin', password='password', group='admin')) # create default admin user
     db.session.commit() # commits database
 
+def get_user(user):
+    id = User.query.filter_by(username=user).first()
+    return id.user_id
+
+def get_user_group(user):
+    group = User.query.filter_by(username=user).first()
+    return group
 
 # functions
 @app.route("/", methods=['GET', 'POST'])
@@ -64,48 +71,73 @@ def hello():
 def home():
     return render_template("home.html")
 
-@app.route("/signin", methods=['GET', 'POST'])
-def signin():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        user = User.query.filter_by(username=username).first()
-
-        if user and user.password == password:
-            session['user_id'] = user.user_id
-            flash('Logged in successfully!')
-            return redirect(url_for('home'))  
-
-        flash('Wrong username or password! TRY AGAIN')
-
-    return render_template("signin.html")
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
+    if "username" in session:
+        group = User.query.filter_by(username=session['username']).first()
+        return redirect(url_for("home", group=group.group, username=session["username"]))
 
-        #if the username already exists
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists. TRY AGAIN')
-            return redirect(url_for('signup'))
+    # log in
+    if request.method == "POST":
+        username = request.form.get("user")
+        password = request.form.get("pass")
+        password2 = request.form.get("pass2")
+        
+        if username == None or password == None or password2 == None:
+            flash("please fill out all boxes before continuing")
+            return render_template('signup.html')
+        
+        if password != password2:
+            flash("passwords do not match")
+            return render_template('signup.html')
+        
+        # check for duplicate username
+        user = User.query.filter_by(username=username).first()
+        if user is None: 
+            group = 'user'
+            db.session.add(User(username=username, password=password, group=group))
+            db.session.commit()
+            flash("registration complete. you may now log in.")
+            return redirect('/signin')
 
-        # make sure passwords match
-        if password != confirm_password:
-            flash('Passwords do not match. TRY AGAIN')
-            return redirect(url_for('signup'))
+        else:
+            flash("we already have a user with that username. try something else!")
+            return render_template('signup.html') 
+    return render_template('signup.html')
 
-        # create a user profile
-        new_user = User(username=username, password=password, group='user')
-        db.session.add(new_user)
-        db.session.commit()
 
-        flash('Your account has been created successfully, please sign in')
-        return redirect(url_for('signin'))
+@app.route("/signin", methods=['GET', 'POST'])
+def signin():
+    #check if already logged in, if so, go to home
+    if "username" in session:
+        group = User.query.filter_by(username=session['username']).first()
+        return redirect(url_for("home", group=group.group, username=session["username"]))
 
-    return render_template("signup.html")
+    # log in 
+    if request.method == "POST":
+        username = request.form.get("user")
+        password = request.form.get("pass")
+
+        user = User.query.filter_by(username=username, password=password).first()
+        if user is None:
+            flash("incorrect username or password")
+            return render_template('signin.html')
+        else:
+            session['user_id'] = user.user_id
+            session['username'] = user.username
+            session['group'] = user.group
+            return redirect(url_for("home", group=user.group, username=username))
+
+    return render_template('signin.html')
+
+
+# @app.route("/home", methods=['GET', 'POST'])
+# @app.route("/home/<group>/", methods=['GET', 'POST'])
+# @app.route("/home/<group>/<username>/", methods=['GET', 'POST'])
+@app.route("/signout")
+def signout():
+    session.clear()
+    return redirect('/')
 
 app.secret_key = "AERTEYHO"
