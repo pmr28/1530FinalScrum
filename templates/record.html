@@ -1,0 +1,71 @@
+<!-- this page uses jinja because it's easier lol -->
+<!-- here is where our finance tracker home page is -->
+
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+		Welcome!
+        {% if group == 'user' %}
+            <h2>Expenses & Income</h2>
+                <ul class="expenseList">
+                {% for expense in expenses %}
+                    <li><p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p></li>
+                    <form autocomplete = "off" action="{{ url_for('removeexpense') }}" method="POST">
+                    <input type="hidden" name="expense_id" value="{{ expense.expense_id }}">
+                    <input type="hidden" name="user" value="{{ username }}">
+                    <div class="actions"><input type="submit" value="remove expense"></div></form></p>
+                {% else %}
+                    <li>No expenses entered.</li>
+                {% endfor %}
+                </ul>
+                <ul class="incomeList">
+                {% for in in income %}
+                    <li><p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p></li>
+                    <form autocomplete = "off" action="{{ url_for('removeincome') }}" method="POST">
+                    <input type="hidden" name="income_id" value="{{ in.income_id }}">
+                    <input type="hidden" name="user" value="{{ username }}">
+                    <div class="actions"><input type="submit" value="remove income"></div></form></p>
+                {% else %}
+                    <li>No income entered.</li>
+                {% endfor %}
+                </ul>
+
+            <h2>Enter Expense</h2>
+            <form autocomplete = "off" action="{{ url_for('enterexpense') }}" method="POST">
+            <input type="text" placeholder="Name of Expense" label="name" name="name">
+            <input type="text" placeholder="Amount in $" label="amount" name="amount">
+            <input type="date" label="date" name="date">
+            <input type="hidden" name="user" value="{{ username }}">
+            <div class="actions"><input type="submit" value="add"></div></form>
+
+            <h2>Enter Income</h2>
+            <form autocomplete = "off" action="{{ url_for('enterincome') }}" method="POST">
+            <input type="text" placeholder="Name of Income" label="name" name="name">
+            <input type="text" placeholder="Amount in $" label="amount" name="amount">
+            <input type="date" label="date" name="date">
+            <input type="hidden" name="user" value="{{ username }}">
+            <div class="actions"><input type="submit" value="add"></div></form>
+        {% endif %}
+
+        {% if group == 'admin' %} 
+            <h2>Expenses & Income</h2>
+                <ul class="expenseList">
+                {% for expense in expenses %}
+                    <li><p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p></li>
+                {% else %}
+                    <li>No expenses entered.</li>
+                {% endfor %}
+                </ul>
+                <ul class="incomeList">
+                {% for in in income %}
+                    <li><p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p></li>
+                {% else %}
+                    <li>No income entered.</li>
+                {% endfor %}
+                </ul>
+        
+        {% endif %}  
+        <p><button type="button" onclick="document.location='/home/group/username'">home</button></p>
+{% endblock %}

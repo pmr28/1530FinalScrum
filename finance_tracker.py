@@ -61,16 +61,39 @@ def get_user_group(user):
     group = User.query.filter_by(username=user).first()
     return group
 
+def get_expenses(user):
+    group = get_user_group(user)
+    # personal user sees all of their own expenses
+    if group == 'user':
+        expenses = Expense.query.filter(Expense.client == user).order_by(Expense.date).all()
+    # admin can see all expenses of users (????)**************
+    else:  # group = "client"
+        expenses = Expense.query.order_by(Expense.date).all()
+    return expenses
+
+def get_totalexpenses(user):
+    totalexpense = db.session.query(db.func.sum(Expense.amount)).scalar();
+    return totalexpense;   
+
+def get_totalincome(user):
+    totalincome = db.session.query(db.func.sum(Income.amount)).scalar();
+    return totalincome;  
+
+def get_income(user):
+    group = get_user_group(user)
+    # personal user sees all of their own incomes
+    if group == 'user':
+        incomes = Income.query.filter(Income.client == user).order_by(Income.date).all()
+    # admin can see all income of users (????)**************
+    else:  # group = "admin"
+        incomes = Income.query.order_by(Income.date).all()
+    return incomes
+
 # functions
 @app.route("/", methods=['GET', 'POST'])
 def hello():
     return render_template("hello.html")
-
-
-@app.route("/home", methods=['GET', 'POST'])
-def home():
-    return render_template("home.html")
-
+  
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
@@ -132,12 +155,84 @@ def signin():
     return render_template('signin.html')
 
 
-# @app.route("/home", methods=['GET', 'POST'])
-# @app.route("/home/<group>/", methods=['GET', 'POST'])
-# @app.route("/home/<group>/<username>/", methods=['GET', 'POST'])
+@app.route("/home", methods=['GET', 'POST'])
+@app.route("/home/<group>/", methods=['GET', 'POST'])
+@app.route("/home/<group>/<username>/", methods=['GET', 'POST'])
+def home(group, username):
+    expenses = get_expenses(username)
+    income = get_income(username)
+    return render_template('home.html', group = group, username = username, expenses = expenses, income = income)
+  
+
+@app.route("/enterexpense", methods=['GET', 'POST'])
+def enterexpense():
+    if request.method == "POST":
+        username = request.form.get("user")
+        date = request.form.get("date")
+        name = request.form.get("name")
+        amount = request.form.get("amount")
+                
+        db.session.add(Expense(client=username, name=name, date=date, amount=amount))
+        db.session.commit()
+        return redirect(url_for("home", group='user', username=username))
+
+    return redirect(url_for('home', group = 'user', username = username))
+
+@app.route("/enterincome", methods=['GET', 'POST'])
+def enterincome():
+    if request.method == "POST":
+        username = request.form.get("user")
+        date = request.form.get("date")
+        name = request.form.get("name")
+        amount = request.form.get("amount")
+                
+        db.session.add(Income(client=username, name=name, date=date, amount=amount))
+        db.session.commit()
+        return redirect(url_for("home", group='user', username=username))
+
+    return redirect(url_for('home', group = 'user', username = username))
+
+
+@app.route("/removeexpense", methods=['GET', 'POST'])
+def removeexpense():
+    username = request.form.get("user")
+    e = Expense.query.filter(Expense.expense_id == request.form.get("expense_id")).first()
+    db.session.delete(e)
+    db.session.commit()
+    return redirect(url_for('home', group='user', username = username))
+
+@app.route("/removeincome", methods=['GET', 'POST'])
+def removeincome():
+    username = request.form.get("user")
+    i = Income.query.filter(Income.income_id == request.form.get("income_id")).first()
+    db.session.delete(i)
+    db.session.commit()
+    return redirect(url_for('home', group='user', username = username))
+
+
 @app.route("/signout")
 def signout():
     session.clear()
     return redirect('/')
+
+@app.route("/record", methods=['GET', 'POST'])
+@app.route("/record/<group>", methods=["GET", 'POST'])
+@app.route("/record/<group>/<username>", methods=["GET", 'POST'])
+def record():
+    username = request.form.get("user")
+    expenses = get_expenses(username)
+    income = get_income(username)
+    return render_template("record.html", group = 'user', username = username, expenses=expenses, income=income)
+        
+@app.route("/track", methods=['GET', 'POST'])
+@app.route("/track/<group>", methods=["GET", 'POST'])
+@app.route("/track/<group>/<username>", methods=["GET", 'POST'])
+def track():
+    username = request.form.get("user")
+    totale = get_totalexpenses(username)
+    totali = get_totalincome(username)
+    expenses = get_expenses(username)
+    income = get_income(username)
+    return render_template("track.html", group = 'user', username = username, expenses=expenses, income=income, totale=totale, totali=totali)
 
 app.secret_key = "AERTEYHO"
