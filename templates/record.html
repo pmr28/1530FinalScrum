@@ -15,7 +15,7 @@
                     <form autocomplete = "off" action="{{ url_for('removeexpense') }}" method="POST">
                     <input type="hidden" name="expense_id" value="{{ expense.expense_id }}">
                     <input type="hidden" name="user" value="{{ username }}">
-                    <div class="actions"><input type="submit" value="remove expense"></div></form></p>
+                    <div class="actions"><input type="submit" value="Remove Expense"></div></form></p>
                 {% else %}
                     <li>No expenses entered.</li>
                 {% endfor %}
@@ -26,7 +26,7 @@
                     <form autocomplete = "off" action="{{ url_for('removeincome') }}" method="POST">
                     <input type="hidden" name="income_id" value="{{ in.income_id }}">
                     <input type="hidden" name="user" value="{{ username }}">
-                    <div class="actions"><input type="submit" value="remove income"></div></form></p>
+                    <div class="actions"><input type="submit" value="Remove Income"></div></form></p>
                 {% else %}
                     <li>No income entered.</li>
                 {% endfor %}
@@ -38,7 +38,7 @@
             <input type="text" placeholder="Amount in $" label="amount" name="amount">
             <input type="date" label="date" name="date">
             <input type="hidden" name="user" value="{{ username }}">
-            <div class="actions"><input type="submit" value="add"></div></form>
+            <div class="actions"><input type="submit" value="Add"></div></form>
 
             <h2>Enter Income</h2>
             <form autocomplete = "off" action="{{ url_for('enterincome') }}" method="POST">
@@ -46,7 +46,7 @@
             <input type="text" placeholder="Amount in $" label="amount" name="amount">
             <input type="date" label="date" name="date">
             <input type="hidden" name="user" value="{{ username }}">
-            <div class="actions"><input type="submit" value="add"></div></form>
+            <div class="actions"><input type="submit" value="Add"></div></form>
         {% endif %}
 
         {% if group == 'admin' %} 
@@ -67,5 +67,6 @@
                 </ul>
         
         {% endif %}  
-        <p><button type="button" onclick="document.location='/home/group/username'">home</button></p>
+        <!-- /group/username -->
+        <p><button type="button" onclick="document.location='/home/{{group}}/{{username}}'">Home</button></p>
 {% endblock %}
