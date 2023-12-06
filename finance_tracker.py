@@ -21,8 +21,8 @@ class User(db.Model):
 
 class Expense(db.Model):
     expense_id = db.Column(db.Integer, primary_key=True)
-    client = db.Column(db.String(20), default=0) # same as users username
-    name = db.Column(db.String(30), default = "") # name of expense
+    client = db.Column(db.String(), default=0) # same as users username
+    name = db.Column(db.String(), default = "") # name of expense
     date = db.Column(db.String(), unique=True)
     amount = db.Column(db.Integer, default=0)
 
@@ -31,8 +31,8 @@ class Expense(db.Model):
     
 class Income(db.Model):
     income_id = db.Column(db.Integer, primary_key=True)
-    client = db.Column(db.Integer, default=0) # same as users user_id
-    name = db.Column(db.String(30), default = "") # name of income
+    client = db.Column(db.String(), default=0) # same as users user_id
+    name = db.Column(db.String(), default = "") # name of income
     date = db.Column(db.String(), unique=True)
     amount = db.Column(db.Integer, default=0)
 
@@ -50,6 +50,7 @@ db.init_app(app)
 def initdb():
     db.drop_all() # remove all previous data (therefore does not currently last over nultiple sessions)
     db.create_all() # create our models
+    # Admin 
     db.session.add(User(username='admin', password='password', group='admin')) # create default admin user
     db.session.commit() # commits database
 
@@ -59,7 +60,7 @@ def get_user(user):
 
 def get_user_group(user):
     group = User.query.filter_by(username=user).first()
-    return group
+    return group.group
 
 def get_expenses(user):
     group = get_user_group(user)
@@ -72,11 +73,11 @@ def get_expenses(user):
     return expenses
 
 def get_totalexpenses(user):
-    totalexpense = db.session.query(db.func.sum(Expense.amount)).scalar();
+    totalexpense = db.session.query(db.func.sum(Expense.amount).filter(Expense.client == user)).scalar();
     return totalexpense;   
 
 def get_totalincome(user):
-    totalincome = db.session.query(db.func.sum(Income.amount)).scalar();
+    totalincome = db.session.query(db.func.sum(Income.amount)).filter(Income.client == user).scalar();
     return totalincome;  
 
 def get_income(user):
@@ -92,6 +93,7 @@ def get_income(user):
 # functions
 @app.route("/", methods=['GET', 'POST'])
 def hello():
+    session.clear()
     return render_template("hello.html")
   
 
@@ -107,12 +109,12 @@ def signup():
         password = request.form.get("pass")
         password2 = request.form.get("pass2")
         
-        if username == None or password == None or password2 == None:
-            flash("please fill out all boxes before continuing")
+        if not username or not password or not password2:
+            flash("Please fill out all boxes before continuing!")
             return render_template('signup.html')
         
         if password != password2:
-            flash("passwords do not match")
+            flash("Passwords do not match!")
             return render_template('signup.html')
         
         # check for duplicate username
@@ -121,11 +123,11 @@ def signup():
             group = 'user'
             db.session.add(User(username=username, password=password, group=group))
             db.session.commit()
-            flash("registration complete. you may now log in.")
+            flash("Registration complete. You may now log in.")
             return redirect('/signin')
 
         else:
-            flash("we already have a user with that username. try something else!")
+            flash("A user exists with that username. Try something else.")
             return render_template('signup.html') 
     return render_template('signup.html')
 
@@ -144,7 +146,7 @@ def signin():
 
         user = User.query.filter_by(username=username, password=password).first()
         if user is None:
-            flash("incorrect username or password")
+            flash("Incorrect username or password!")
             return render_template('signin.html')
         else:
             session['user_id'] = user.user_id
@@ -174,9 +176,11 @@ def enterexpense():
                 
         db.session.add(Expense(client=username, name=name, date=date, amount=amount))
         db.session.commit()
-        return redirect(url_for("home", group='user', username=username))
+        # return redirect(url_for("home", group='user', username=username))
+        return redirect(url_for('record'))
 
-    return redirect(url_for('home', group = 'user', username = username))
+    # return redirect(url_for('home', group = 'user', username = username))
+    return redirect(url_for('record'))
 
 @app.route("/enterincome", methods=['GET', 'POST'])
 def enterincome():
@@ -188,9 +192,11 @@ def enterincome():
                 
         db.session.add(Income(client=username, name=name, date=date, amount=amount))
         db.session.commit()
-        return redirect(url_for("home", group='user', username=username))
+        # return redirect(url_for("home", group='user', username=username))
+        return redirect(url_for('record'))
 
-    return redirect(url_for('home', group = 'user', username = username))
+    # return redirect(url_for('home', group = 'user', username = username))
+    return redirect(url_for('record'))
 
 
 @app.route("/removeexpense", methods=['GET', 'POST'])
@@ -199,7 +205,8 @@ def removeexpense():
     e = Expense.query.filter(Expense.expense_id == request.form.get("expense_id")).first()
     db.session.delete(e)
     db.session.commit()
-    return redirect(url_for('home', group='user', username = username))
+    # return redirect(url_for('home', group='user', username = username))
+    return redirect(url_for('record'))
 
 @app.route("/removeincome", methods=['GET', 'POST'])
 def removeincome():
@@ -207,7 +214,8 @@ def removeincome():
     i = Income.query.filter(Income.income_id == request.form.get("income_id")).first()
     db.session.delete(i)
     db.session.commit()
-    return redirect(url_for('home', group='user', username = username))
+    # return redirect(url_for('home', group='user', username = username))
+    return redirect(url_for('record'))
 
 
 @app.route("/signout")
@@ -219,7 +227,7 @@ def signout():
 @app.route("/record/<group>", methods=["GET", 'POST'])
 @app.route("/record/<group>/<username>", methods=["GET", 'POST'])
 def record():
-    username = request.form.get("user")
+    username = session['username']
     expenses = get_expenses(username)
     income = get_income(username)
     return render_template("record.html", group = 'user', username = username, expenses=expenses, income=income)
@@ -228,7 +236,7 @@ def record():
 @app.route("/track/<group>", methods=["GET", 'POST'])
 @app.route("/track/<group>/<username>", methods=["GET", 'POST'])
 def track():
-    username = request.form.get("user")
+    username = session['username']
     totale = get_totalexpenses(username)
     totali = get_totalincome(username)
     expenses = get_expenses(username)

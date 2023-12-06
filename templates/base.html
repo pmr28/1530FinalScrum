@@ -4,11 +4,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>{% block title %}loginForm!{% endblock %}</title>
+		<title>{% block title %}Login Form{% endblock %}</title>
 	</head>
 	<body>
 		{% if "username" in session %}
-			Logged in as {{ session["username"] }}, <a href="{{ url_for("signout") }}">click here to logout</a>
+			Logged in as {{ session["username"] }}, <a href="{{ url_for("signout") }}">click here to logout!</a>
 			<br />
 			<br />
 		{% endif %}
