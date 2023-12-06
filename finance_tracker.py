@@ -1,5 +1,6 @@
 # required imports
 import os
+import unittest
 from flask import Flask, request, url_for, redirect, render_template, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
@@ -106,8 +107,8 @@ def signup():
     # log in
     if request.method == "POST":
         username = request.form.get("user")
-        password = request.form.get("pass")
-        password2 = request.form.get("pass2")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
         
         if not username or not password or not password2:
             flash("Please fill out all boxes before continuing!")
@@ -142,7 +143,7 @@ def signin():
     # log in 
     if request.method == "POST":
         username = request.form.get("user")
-        password = request.form.get("pass")
+        password = request.form.get("password")
 
         user = User.query.filter_by(username=username, password=password).first()
         if user is None:
