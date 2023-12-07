@@ -30,3 +30,6 @@ OR
 3. "pip install flask flask-sqlalchemy"
 4. "flask --app finance_tracker initdb"
 5. "flask --app finance_tracker run"
+
+## How to Run Unit Test
+`python test_expenses.py`
