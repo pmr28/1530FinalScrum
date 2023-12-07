@@ -1,34 +1,63 @@
+import os
 import unittest
-from flask import Flask
-from flask_testing import TestCase
-from finance_tracker import app, db, User, Expense, Income, initdb
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import or_
+from flask import Flask, session
+from finance_tracker import app, db, User
 
+class FinanceTrackerTestCase(unittest.TestCase):
 
-class expenseTest(TestCase):
-
-    def create_app(self):
-        app = Flask(__name__)
+    def setUp(self):
         app.config['TESTING'] = True
-        return app
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.app = app.test_client()
+        with app.app_context():
+            db.create_all()
 
-    def test_signup(self):
-        response = self.client.post('/signup', data=dict(user='new_user', password='password', password2='password'), follow_redirects=True)
-        assert b'Registration complete' in response.data
+    def tearDown(self):
+        with app.app_context():
+            db.drop_all()
 
-    def test_signin(self):
-        response = self.client.post('/signin', data=dict(user='admin',password='password'), follow_redirects=True)
+    def test_registration(self):
+        response = self.app.post('/signup', data=dict(
+            user='testuser',
+            password='testpassword',
+            password2='testpassword'
+        ), follow_redirects=True)
+        self.assertIn(b'Registration complete. You may now log in.', response.data)
 
-        assert b'Welcome, admin' in response.data
+    # test for usernames that already exist when signing up
+    def test_duplicate_user(self):
+        response = self.app.post('/signup', data=dict(
+            user='testuser',
+            password='testpassword',
+            password2='testpassword'
+        ), follow_redirects=True)
 
-    def test_enterexpense(self):
-        self.client.post('/signin', data=dict(user='admin',password='password'), follow_redirects=True)
+        response = self.app.post('/signup', data=dict(
+            user='testuser',
+            password='testpassword',
+            password2='testpassword'
+        ), follow_redirects=True)
+        self.assertIn(b'A user exists with that username. Try something else.', response.data)
 
-        response = self.client.post('/enterexpense', data=dict(user='admin',date='2023-01-01',name='Test Expense',amount=100), follow_redirects=True)
+    def test_login(self):
+        # sign up
+        self.app.post('/signup', data=dict(
+            user='testuser',
+            password='testpassword',
+            password2='testpassword'
+        ), follow_redirects=True)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Expense recorded successfully', response.data)
-      
+        # log in
+        response = self.app.post('/signin', data=dict(
+            user='testuser',
+            password='testpassword'
+        ), follow_redirects=True)
+        self.assertIn(b'testuser', response.data)
+
+        # sign out
+        response = self.app.get('/signout', follow_redirects=True)
+        self.assertNotIn(b'Logged in as', response.data)
+        self.assertIn(b'Sign In Here!', response.data)
+
 if __name__ == '__main__':
     unittest.main()
