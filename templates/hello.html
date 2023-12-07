@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Welcome to Your Finance Tracker</title>
-	</head>
-	<body>
-		<h2>Welcome to Your Finance Tracker</h2>
-        <p><button type="button" onclick="document.location='/signin'">Sign In Here!</button></p>
-        <p><button type="button" onclick="document.location='/signup'">Register Here!</button></p>
-        <p><button type="button" onclick="document.location='/signout'">Click Here to Sign Out</button></p>
-	</body>
+
+<head>
+	<title>Welcome to Your Finance Tracker</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/hello.css')}}">
+</head>
+
+<body>
+	<h1 id="title">Welcome to Your Finance Tracker</h1>
+	<div id="finimg"><img src="{{url_for('static', filename='images/finance.jpg')}}" alt=""></div>
+	<br>
+	<div class="buttons">
+		<p><button type="button" onclick="document.location='/signin'">Sign In Here!</button></p>
+		<p><button type="button" onclick="document.location='/signup'">Register Here!</button></p>
+	</div>
+</body>
+
 </html>

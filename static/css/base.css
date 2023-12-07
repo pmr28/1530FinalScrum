@@ -1,0 +1,137 @@
+.flashes {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+  color: red;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+}
+
+.flashes li {
+  opacity: 0;
+  animation: fadeInOut 1s linear infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	min-width: 1500px;
+}
+
+#left {
+	float: left;
+	width: 35%;
+}
+
+#right {
+	float: left;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 50%;
+}
+
+#wb {
+	margin-top: 50px;
+	text-align: center;
+}
+
+#lock {
+	margin-top: 100px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 300px;
+}
+
+.pic {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#log {
+	margin-top: 150px;
+	margin-bottom: 50px;
+}
+
+#sign {
+	font-size: large;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.login-container {
+	text-align: center;
+}
+
+form {
+	text-align: left; /* Align form elements to the left within the container */
+}
+
+form label,
+form input[type="text"],
+form input[type="password"],
+form input[type="submit"] {
+  display: block;
+  margin-bottom: 10px; /* Adjust spacing between elements */
+}
+
+.cancel {
+	margin-top: 10px;
+	font-size: large;
+}
+
+#rechead {
+	text-align: center;
+	margin-bottom: 50px;
+}
+
+#l1 {
+	float: left;
+	width: 50%;
+	margin-left: 75px;
+	max-height: 525px;
+	overflow-y: auto;
+}
+
+#r1 {
+	float: left;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 35%;
+}
+
+#r1 img{
+	margin-top: 50px;
+	width: 500px;
+}
+
+.actions {
+	margin-top: 10px;
+}
+
+.actions input[type="submit"] {
+	margin-left: 25px;
+}
+
+#w1 {
+	min-height: 509px;
+}
+
+#home {
+	text-align: center;
+}
+
+#home button {
+	font-size: large;
+}

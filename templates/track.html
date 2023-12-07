@@ -3,31 +3,38 @@
 {% block title %}Profile{% endblock %}
 
 {% block body %}
-		Welcome!
+<h1 id="rechead">Track Finances</h1>
+<div id="w1">
+    <div id="l1">
         {% if group == 'user' %}
-            <h2>Expenses & Income</h2>
-                <ul class="expenseList">
-                <h4>Total Expenses: -${{totale}}</h4>
-                {% for expense in expenses %}
-                    <li><p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p></li>
-                    
-                    <input type="hidden" name="expense_id" value="{{ expense.expense_id }}">
-                    <input type="hidden" name="user" value="{{ username }}">
-                {% else %}
-                    <li>No expenses entered.</li>
-                {% endfor %}
-                </ul>
-                <ul class="incomeList">
-                <h4>Total Income: ${{totali}}</h4>
-                {% for in in income %}
-                    <li><p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p></li>
-                   
-                    <input type="hidden" name="income_id" value="{{ in.income_id }}">
-                    <input type="hidden" name="user" value="{{ username }}">
-                {% else %}
-                    <li>No income entered.</li>
-                {% endfor %}
-                </ul>
+        <h2>Expenses & Income</h2>
+        <ul class="expenseList">
+            <h4>Total Expenses: -${{totale}}</h4>
+            {% for expense in expenses %}
+            <li>
+                <p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p>
+            </li>
+            {% else %}
+            <li>No expenses entered.</li>
+            {% endfor %}
+        </ul>
+        <ul class="incomeList">
+            <h4>Total Income: ${{totali}}</h4>
+            {% for in in income %}
+            <li>
+                <p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p>
+            </li>
+            {% else %}
+            <li>No income entered.</li>
+            {% endfor %}
+        </ul>
         {% endif %}
-        <p><button type="button" onclick="document.location='/home/{{group}}/{{username}}'">Home</button></p>
-     {% endblock %}
+    </div>
+    <div id="r1">
+        <img src="{{url_for('static', filename='images/track.jpg')}}" alt="">
+    </div>
+</div>
+<div id="home">
+    <p><button type="button" onclick="document.location='/home/{{group}}/{{username}}'">Home</button></p>
+</div>
+{% endblock %}
