@@ -10,6 +10,8 @@ All scrum documentation and deployment diagram located in the PDF in the repo.
 Download and extract the zip file from the main repo somehwere on your machine
 Python must be installed to run
 
+## How to Run Application
+
 ### How To Run on MacOS
 ##### In terminal in project folder:
 1. `python3 -m venv .venv`
@@ -19,6 +21,7 @@ Python must be installed to run
 5. `flask --app finance_tracker run`
 
 OR 
+
 ##### Use the makefile (still in terminal in project folder): 
 1. `python3 -m venv .venv`
 2. `. .venv/bin/activate`
