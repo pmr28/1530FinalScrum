@@ -6,67 +6,88 @@
 {% block title %}Profile{% endblock %}
 
 {% block body %}
-		Welcome!
+<h1 id="rechead">Record Finances</h1>
+<div id="w1">
+    <div id="l1">
         {% if group == 'user' %}
-            <h2>Expenses & Income</h2>
-                <ul class="expenseList">
-                {% for expense in expenses %}
-                    <li><p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p></li>
-                    <form autocomplete = "off" action="{{ url_for('removeexpense') }}" method="POST">
-                    <input type="hidden" name="expense_id" value="{{ expense.expense_id }}">
-                    <input type="hidden" name="user" value="{{ username }}">
-                    <div class="actions"><input type="submit" value="Remove Expense"></div></form></p>
-                {% else %}
-                    <li>No expenses entered.</li>
-                {% endfor %}
-                </ul>
-                <ul class="incomeList">
-                {% for in in income %}
-                    <li><p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p></li>
-                    <form autocomplete = "off" action="{{ url_for('removeincome') }}" method="POST">
-                    <input type="hidden" name="income_id" value="{{ in.income_id }}">
-                    <input type="hidden" name="user" value="{{ username }}">
-                    <div class="actions"><input type="submit" value="Remove Income"></div></form></p>
-                {% else %}
-                    <li>No income entered.</li>
-                {% endfor %}
-                </ul>
+        <h2>Expenses & Income</h2>
+        <ul class="expenseList">
+            {% for expense in expenses %}
+            <li>
+                <p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p>
+            </li>
+            <form autocomplete="off" action="{{ url_for('removeexpense') }}" method="POST">
+                <input type="hidden" name="expense_id" value="{{ expense.expense_id }}">
+                <input type="hidden" name="user" value="{{ username }}">
+                <div class="actions"><input type="submit" value="Remove Expense"></div>
+            </form>
+            {% else %}
+            <li>No expenses entered.</li>
+            {% endfor %}
+        </ul>
+        <ul class="incomeList">
+            {% for in in income %}
+            <li>
+                <p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p>
+            </li>
+            <form autocomplete="off" action="{{ url_for('removeincome') }}" method="POST">
+                <input type="hidden" name="income_id" value="{{ in.income_id }}">
+                <input type="hidden" name="user" value="{{ username }}">
+                <div class="actions"><input type="submit" value="Remove Income"></div>
+            </form>
+            {% else %}
+            <li>No income entered.</li>
+            {% endfor %}
+        </ul>
 
-            <h2>Enter Expense</h2>
-            <form autocomplete = "off" action="{{ url_for('enterexpense') }}" method="POST">
+        <h2>Enter Expense:</h2>
+        <form autocomplete="off" action="{{ url_for('enterexpense') }}" method="POST">
             <input type="text" placeholder="Name of Expense" label="name" name="name">
             <input type="text" placeholder="Amount in $" label="amount" name="amount">
             <input type="date" label="date" name="date">
             <input type="hidden" name="user" value="{{ username }}">
-            <div class="actions"><input type="submit" value="Add"></div></form>
+            <div class="actions"><input type="submit" value="Add"></div>
+        </form>
 
-            <h2>Enter Income</h2>
-            <form autocomplete = "off" action="{{ url_for('enterincome') }}" method="POST">
+        <h2>Enter Income:</h2>
+        <form autocomplete="off" action="{{ url_for('enterincome') }}" method="POST">
             <input type="text" placeholder="Name of Income" label="name" name="name">
             <input type="text" placeholder="Amount in $" label="amount" name="amount">
             <input type="date" label="date" name="date">
             <input type="hidden" name="user" value="{{ username }}">
-            <div class="actions"><input type="submit" value="Add"></div></form>
+            <div class="actions"><input type="submit" value="Add"></div>
+        </form>
         {% endif %}
 
-        {% if group == 'admin' %} 
-            <h2>Expenses & Income</h2>
-                <ul class="expenseList">
-                {% for expense in expenses %}
-                    <li><p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p></li>
-                {% else %}
-                    <li>No expenses entered.</li>
-                {% endfor %}
-                </ul>
-                <ul class="incomeList">
-                {% for in in income %}
-                    <li><p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p></li>
-                {% else %}
-                    <li>No income entered.</li>
-                {% endfor %}
-                </ul>
-        
-        {% endif %}  
-        <!-- /group/username -->
-        <p><button type="button" onclick="document.location='/home/{{group}}/{{username}}'">Home</button></p>
+        {% if group == 'admin' %}
+        <h2>Expenses & Income</h2>
+        <ul class="expenseList">
+            {% for expense in expenses %}
+            <li>
+                <p>Expense: {{ expense.name }} | Amount: ${{ expense.amount }} | Date: {{ expense.date }}</p>
+            </li>
+            {% else %}
+            <li>No expenses entered.</li>
+            {% endfor %}
+        </ul>
+        <ul class="incomeList">
+            {% for in in income %}
+            <li>
+                <p>Income: {{ in.name }} | Amount: ${{ in.amount }} | Date: {{ in.date }}</p>
+            </li>
+            {% else %}
+            <li>No income entered.</li>
+            {% endfor %}
+        </ul>
+
+        {% endif %}
+
+    </div>
+    <div id="r1">
+        <img src="{{url_for('static', filename='images/rec.jpg')}}" alt="">
+    </div>
+</div>
+<div id="home">
+    <p><button type="button" onclick="document.location='/home/{{group}}/{{username}}'">Home</button></p>
+</div>
 {% endblock %}

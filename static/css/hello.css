@@ -1,0 +1,24 @@
+#title {
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#finimg {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.buttons {
+	display: flex;
+  	justify-content: center;
+}
+
+.buttons button {
+	margin: 0 25px;
+	font-size: large;
+}
+
+body {
+	min-width: 1500px;
+}

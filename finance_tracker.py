@@ -174,6 +174,11 @@ def enterexpense():
         date = request.form.get("date")
         name = request.form.get("name")
         amount = request.form.get("amount")
+
+        if not date or not name or not amount:
+            flash("Please make sure all fields are filled!")
+            return redirect(url_for('record'))
+
                 
         db.session.add(Expense(client=username, name=name, date=date, amount=amount))
         db.session.commit()
@@ -190,6 +195,10 @@ def enterincome():
         date = request.form.get("date")
         name = request.form.get("name")
         amount = request.form.get("amount")
+
+        if not date or not name or not amount:
+            flash("Please make sure all fields are filled!")
+            return redirect(url_for('record'))
                 
         db.session.add(Income(client=username, name=name, date=date, amount=amount))
         db.session.commit()

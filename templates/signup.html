@@ -3,14 +3,30 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block body %}
-		<form autocomplete = "off" action="" method="POST">
-			Username:  <input type="text" name="user" />
-			<br />
-			Password:  <input type="text" name="password" />
-			<br />
-            Confirm Password:  <input type="text" name="password2" />
-			<br />
-			<input type="submit" value="Submit" />
-		</form>
-		<button type="button" onclick="document.location='/'">Cancel</button>
+<div id="wrapper">
+	<div id="left">
+		<div class="pic">
+			<img id="lock" src="{{url_for('static', filename='images/lock.png')}}" alt="">
+		</div>
+		<h1 id="wb">Welcome!</h1>
+	</div>
+	<div id="right">
+		<div class="login-container">
+			<h1 id="log">Register</h1>
+			<form autocomplete="off" action="" method="POST">
+				<label for="user">Username: </label>
+				<input type="text" name="user" id="user" />
+				<br />
+				<label for="password">Password: </label>
+				<input type="text" name="password" id="password" />
+				<br />
+				<label for="password">Confirm Password: </label>
+				<input type="text" name="password2" id="password2" />
+				<br />
+				<input id="sign" type="submit" value="Register" />
+			</form>
+			<button class="cancel" type="button" onclick="document.location='/'">Cancel</button>
+		</div>
+	</div>
+</div>
 {% endblock %}
